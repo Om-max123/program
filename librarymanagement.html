@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .menu-btn:hover {
+            background-color: #2980b9;
+        }
+        .form-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .submit-btn {
+            padding: 10px 15px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #219653;
+        }
+        .books-display {
+            margin-top: 20px;
+        }
+        .book-item {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 5px solid #3498db;
+        }
+        #back-btn {
+            padding: 10px 15px;
+            background-color: #7f8c8d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #back-btn:hover {
+            background-color: #6c7a89;
+        }
+        #booksList {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Library Management System</h1>
+    </div>
+    
+    <!-- Main Menu -->
+    <div id="main-menu">
+        <button class="menu-btn" onclick="showSection('add-book')">1 - Add a Book</button>
+        <button class="menu-btn" onclick="displayBooks()">2 - Display All Books</button>
+        <button class="menu-btn" onclick="showSection('borrow-book')">3 - Borrow a Book</button>
+        <button class="menu-btn" onclick="showSection('return-book')">4 - Return a Book</button>
+        <button class="menu-btn" onclick="exitSystem()">5 - Exit the Program</button>
+    </div>
+    
+    <!-- Add Book Form -->
+    <div id="add-book" class="form-section">
+        <h2>Add a New Book</h2>
+        <div class="form-group">
+            <label for="bookId">Book ID (in number):</label>
+            <input type="number" id="bookId" required>
+        </div>
+        <div class="form-group">
+            <label for="bookName">Book Name:</label>
+            <input type="text" id="bookName" required>
+        </div>
+        <div class="form-group">
+            <label for="authorName">Author Name:</label>
+            <input type="text" id="authorName" required>
+        </div>
+        <div class="form-group">
+            <label for="quantity">Quantity of Books (in number):</label>
+            <input type="number" id="quantity" required>
+        </div>
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" id="price" required>
+        </div>
+        <button class="submit-btn" onclick="addBook()">Add Book</button>
+        <button id="back-btn" onclick="showMainMenu()">Back to Main Menu</button>
+        <div id="add-message"></div>
+    </div>
+    
+    <!-- Display Books Section -->
+    <div id="display-books" class="form-section">
+        <h2>All Books in Library</h2>
+        <div id="booksList"></div>
+        <button id="back-btn" onclick="showMainMenu()">Back to Main Menu</button>
+    </div>
+    
+    <!-- Borrow Book Form -->
+    <div id="borrow-book" class="form-section">
+        <h2>Borrow a Book</h2>
+        <div class="form-group">
+            <label for="borrowBookId">Book ID:</label>
+            <input type="number" id="borrowBookId" required>
+        </div>
+        <button class="submit-btn" onclick="borrowBook()">Borrow Book</button>
+        <button id="back-btn" onclick="showMainMenu()">Back to Main Menu</button>
+        <div id="borrow-message"></div>
+    </div>
+    
+    <!-- Return Book Form -->
+    <div id="return-book" class="form-section">
+        <h2>Return a Book</h2>
+        <div class="form-group">
+            <label for="returnBookId">Book ID:</label>
+            <input type="number" id="returnBookId" required>
+        </div>
+        <button class="submit-btn" onclick="returnBook()">Return Book</button>
+        <button id="back-btn" onclick="showMainMenu()">Back to Main Menu</button>
+        <div id="return-message"></div>
+    </div>
+    
+    <!-- Exit Message -->
+    <div id="exit-message" class="form-section">
+        <h2>Thank you for using Library Management System :)</h2>
+        <button id="back-btn" onclick="showMainMenu()">Return to Main Menu</button>
+    </div>
+
+    <script>
+        // Initialize library if it doesn't exist in localStorage
+        if (!localStorage.getItem('libraryBooks')) {
+            localStorage.setItem('libraryBooks', JSON.stringify([]));
+        }
+
+        // Function to show specific section and hide others
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.form-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Hide main menu
+            document.getElementById('main-menu').style.display = 'none';
+            
+            // Show requested section
+            document.getElementById(sectionId).style.display = 'block';
+            
+            // Clear any previous messages
+            const messageElements = document.querySelectorAll('[id$="-message"]');
+            messageElements.forEach(el => {
+                el.innerHTML = '';
+            });
+        }
+        
+        // Function to return to main menu
+        function showMainMenu() {
+            // Hide all sections
+            const sections = document.querySelectorAll('.form-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show main menu
+            document.getElementById('main-menu').style.display = 'block';
+        }
+        
+        // Function to add a new book
+        function addBook() {
+            const bookId = parseInt(document.getElementById('bookId').value);
+            const bookName = document.getElementById('bookName').value;
+            const authorName = document.getElementById('authorName').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const price = parseInt(document.getElementById('price').value);
+            
+            // Validate inputs
+            if (!bookId || !bookName || !authorName || !quantity || !price) {
+                showMessage('add-message', 'Please fill all fields', 'error');
+                return;
+            }
+            
+            // Get current books
+            const books = JSON.parse(localStorage.getItem('libraryBooks'));
+            
+            // Check if book ID already exists
+            const bookExists = books.some(book => book[0] === bookId);
+            if (bookExists) {
+                showMessage('add-message', 'A book with this ID already exists', 'error');
+                return;
+            }
+            
+            // Add new book [bookid, bookname, authorname, quantity, qty_iss, cost]
+            books.push([bookId, bookName, authorName, quantity, 0, price]);
+            
+            // Save updated books
+            localStorage.setItem('libraryBooks', JSON.stringify(books));
+            
+            // Clear form and show success message
+            document.getElementById('bookId').value = '';
+            document.getElementById('bookName').value = '';
+            document.getElementById('authorName').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('price').value = '';
+            
+            showMessage('add-message', 'Book added successfully!', 'success');
+        }
+        
+        // Function to display all books
+        function displayBooks() {
+            showSection('display-books');
+            
+            const booksList = document.getElementById('booksList');
+            booksList.innerHTML = '';
+            
+            const books = JSON.parse(localStorage.getItem('libraryBooks'));
+            
+            if (books.length === 0) {
+                booksList.innerHTML = '<p>No books in the library.</p>';
+                return;
+            }
+            
+            books.forEach(book => {
+                const bookItem = document.createElement('div');
+                bookItem.className = 'book-item';
+                bookItem.innerHTML = `
+                    <p><strong>Book ID:</strong> ${book[0]} | <strong>Book Name:</strong> ${book[1].padEnd(15)} | 
+                    <strong>Author Name:</strong> ${book[2].padEnd(10)} | <strong>Quantity:</strong> ${book[3]} | 
+                    <strong>Issued Quantity:</strong> ${book[4]} | <strong>Price:</strong> ${book[5]}</p>
+                `;
+                booksList.appendChild(bookItem);
+            });
+        }
+        
+        // Function to borrow a book
+        function borrowBook() {
+            const bookId = parseInt(document.getElementById('borrowBookId').value);
+            
+            if (!bookId) {
+                showMessage('borrow-message', 'Please enter a Book ID', 'error');
+                return;
+            }
+            
+            const books = JSON.parse(localStorage.getItem('libraryBooks'));
+            let found = false;
+            
+            for (let i = 0; i < books.length; i++) {
+                if (books[i][0] === bookId) {
+                    found = true;
+                    if (books[i][3] > 0 && books[i][4] < books[i][3]) {
+                        // Update issued quantity
+                        books[i][4] += 1;
+                        showMessage('borrow-message', 'Borrowing Completed', 'success');
+                    } else {
+                        showMessage('borrow-message', 'Book not available', 'error');
+                    }
+                    break;
+                }
+            }
+            
+            if (!found) {
+                showMessage('borrow-message', 'Book not available', 'error');
+            }
+            
+            // Save updated books
+            localStorage.setItem('libraryBooks', JSON.stringify(books));
+            document.getElementById('borrowBookId').value = '';
+        }
+        
+        // Function to return a book
+        function returnBook() {
+            const bookId = parseInt(document.getElementById('returnBookId').value);
+            
+            if (!bookId) {
+                showMessage('return-message', 'Please enter a Book ID', 'error');
+                return;
+            }
+            
+            const books = JSON.parse(localStorage.getItem('libraryBooks'));
+            let found = false;
+            
+            for (let i = 0; i < books.length; i++) {
+                if (books[i][0] === bookId) {
+                    found = true;
+                    if (books[i][4] > 0 && books[i][4] <= books[i][3]) {
+                        // Update issued quantity
+                        books[i][4] -= 1;
+                        showMessage('return-message', 'Return Completed', 'success');
+                    } else {
+                        showMessage('return-message', 'This book is not issued', 'error');
+                    }
+                    break;
+                }
+            }
+            
+            if (!found) {
+                showMessage('return-message', 'Book not available', 'error');
+            }
+            
+            // Save updated books
+            localStorage.setItem('libraryBooks', JSON.stringify(books));
+            document.getElementById('returnBookId').value = '';
+        }
+        
+        // Function to exit the system
+        function exitSystem() {
+            showSection('exit-message');
+        }
+        
+        // Helper function to show messages
+        function showMessage(elementId, message, type) {
+            const messageElement = document.getElementById(elementId);
+            messageElement.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            // Auto-clear message after 3 seconds
+            setTimeout(() => {
+                messageElement.innerHTML = '';
+            }, 3000);
+        }
+        
+        // Initialize by showing the main menu
+        showMainMenu();
+    </script>
+</body>
+</html>
